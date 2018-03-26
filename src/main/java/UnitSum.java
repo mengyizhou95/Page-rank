@@ -18,7 +18,10 @@ public class UnitSum {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 
             //input format: toPage\t unitMultiplication
+            String[] pageRank = value.toString().split("\t");
+            double subRank = Double.parseDouble(pageRank[1]);
             //target: pass to reducer
+            context.write(new Text(pageRank[0]), new DoubleWritable(subRank));
         }
     }
 
@@ -30,6 +33,13 @@ public class UnitSum {
 
            //input key = toPage value = <unitMultiplication>
             //target: sum!
+            double sum = 0;
+            for (DoubleWritable value : values){
+                sum += value.get();
+            }
+            DecimalFormat df = new DecimalFormat("#.0000"); //regulate the format
+            sum = Double.valueOf(df.format(sum));
+            context.write(key, new DoubleWritable(sum));
         }
     }
 
